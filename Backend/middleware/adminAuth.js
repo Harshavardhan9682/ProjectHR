@@ -1,0 +1,31 @@
+const jwt = require("jsonwebtoken");
+
+const verifyToken = (req, res, next) => {
+  
+  try {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({ message: "Token missing" });
+    }
+
+    const token = authHeader.split(" ")[1];
+
+    const decoded = jwt.verify(token, process.env.ADMIN_KEY);
+
+    if (!decoded.id && !decoded._id) {
+      return res.status(401).json({ message: "Invalid token payload" });
+    }
+
+    req.admin = {
+      id: decoded.id || decoded._id,
+      email: decoded.email,
+    };
+
+    next();
+  } catch (error) {
+    return res.status(401).json({ message: "Invalid or expired token" });
+  }
+};
+
+module.exports = verifyToken;
