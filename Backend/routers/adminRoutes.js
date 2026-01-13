@@ -13,8 +13,8 @@ const {
 } = require("../controllers/adminControllers");
 
 adminRoutes.post("/test",auth, testCreate);
-adminRoutes.get("/",auth,getTestData);
-adminRoutes.get("/:id",getTestDataById);
+adminRoutes.get("/",getTestData);
+adminRoutes.get("/:id",auth,getTestDataById);
 adminRoutes.put("/:id",auth, testUpdate);
 adminRoutes.delete("/delete",auth, deleteTestDataById);
 adminRoutes.post("/register",adminRegister)

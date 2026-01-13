@@ -19,7 +19,7 @@ const verifyToken = (req, res, next) => {
 
     req.admin = {
       id: decoded.id || decoded._id,
-      email: decoded.email,
+      role:decoded.role
     };
 
     next();
@@ -27,5 +27,6 @@ const verifyToken = (req, res, next) => {
     return res.status(401).json({ message: "Invalid or expired token" });
   }
 };
+
 
 module.exports = verifyToken;

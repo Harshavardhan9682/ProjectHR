@@ -61,6 +61,7 @@ exports.testUpdate = async (req, res) => {
 exports.getTestData = async (req, res) => {
   try {
     const testdata = await testData.find();
+    // console.log(req.admin,"hhhh")
     res
       .status(200)
       .json({ message: "data is successfully geted ", data: testdata });
@@ -71,7 +72,7 @@ exports.getTestData = async (req, res) => {
 exports.getTestDataById = async (req, res) => {
   try {
     const id = req.params.id;
-    
+    const category=req.admin.role
     const testdata = await testData.findById(id);
     
     res.status(200).json({ message: "data get successfully ", data: testdata });

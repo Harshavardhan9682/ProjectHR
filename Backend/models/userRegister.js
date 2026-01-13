@@ -1,19 +1,22 @@
 const mongoose = require("mongoose");
 
-const userRegister = new mongoose.Schema({
+const userRegisterSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
   },
+
   email: {
     type: String,
     required: true,
     unique: true,
   },
+
   password: {
     type: String,
     required: true,
   },
+
   category: {
     type: String,
     required: true,
@@ -24,14 +27,23 @@ const userRegister = new mongoose.Schema({
     enum: ["Active", "inActive"],
     default: "Active",
   },
+
   count: {
     type: Number,
     default: 0,
   },
-    dateOfReg: {
-        type: Date,
-        default: Date.now,
-      },
+
+  /* ✅ CORRECT EXAM FIELD */
+  examId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Exam", // optional but recommended
+  },
+
+  dateOfReg: {
+    type: Date,
+    default: Date.now,
+  },
 });
-const userRegisterData = mongoose.model("users", userRegister);
-module.exports = userRegisterData;
+
+const User = mongoose.model("users", userRegisterSchema);
+module.exports = User;

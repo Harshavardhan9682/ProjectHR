@@ -107,9 +107,11 @@ const UserRegister = () => {
           required
         >
           <MenuItem value="">select</MenuItem>
-          <MenuItem value="User">User</MenuItem>
-          <MenuItem value="Admin">Admin</MenuItem>
+          <MenuItem value="Node">Node</MenuItem>
+          <MenuItem value="React">React</MenuItem>
         </TextField>
+
+
 
         {/* {error && (
           <Typography color="error" sx={{ mt: 1 }}>

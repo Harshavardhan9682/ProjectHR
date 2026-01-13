@@ -2,6 +2,7 @@ const User = require("../models/userRegister");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
+
 /* REGISTER */
 exports.userRegister = async (req, res) => {
   try {
@@ -29,9 +30,6 @@ exports.loginUser = async (req, res) => {
     const { email, password } = req.body;
   
     const user = await User.findOne({ email });
-  
-
-
     if (!user) return res.status(404).json({ message: "User not found" });
 
     if(user.status=="Inactive") return res.status(403).json({message:"user is  inactive "})
@@ -61,8 +59,28 @@ exports.loginUser = async (req, res) => {
 };
 
 exports.getUsers = async (req, res) => {
-  const users = await User.find();
+ try{
+   const { query, category} = req.query;
+
+    const filter = {};
+
+    if (query && query.trim() !== "") {
+       filter.$or = [
+    { name: { $regex: query, $options: "i" } },
+    { email: { $regex: query, $options: "i" } },
+  ];
+    }
+    
+
+    if (category && category.trim() !== "") {
+      filter.category=category;
+    }
+
+  const users = await User.find(filter);
   res.json({ data: users });
+ }catch(error){
+  res.status(500).json({message:"fetch to  fail"})
+ }
 };
 
 /* GET USER BY ID */
@@ -79,8 +97,41 @@ exports.updateUser = async (req, res) => {
   res.json({ user });
 };
 
+
 /* DELETE USER */
 exports.deleteData = async (req, res) => {
   await User.findByIdAndDelete(req.params.id);
   res.json({ message: "User deleted" });
+};
+
+exports.assignExam = async (req, res) => {
+  try {
+    const { userIds, examId } = req.body;
+
+    // validation
+    if (!Array.isArray(userIds) || userIds.length === 0 || !examId) {
+      return res.status(400).json({
+        success: false,
+        message: "userIds (array) and examId are required",
+      });
+    }
+
+    // BULK UPDATE
+    const result = await User.updateMany(
+      { _id: { $in: userIds } }, // Mongo auto-casts strings to ObjectId
+      { $set: { examId } }
+    );
+
+    return res.status(200).json({
+      success: true,
+      matched: result.matchedCount,
+      updated: result.modifiedCount,
+    });
+  } catch (err) {
+    console.error("Assign exam error:", err);
+    return res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
 };

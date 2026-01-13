@@ -4,9 +4,12 @@ import axiosInstance from "../axisInstance/axisInstance";
 /* FETCH USERS */
 export const fetchUsers = createAsyncThunk(
   "users/fetchAll",
-  async (_, { rejectWithValue }) => {
+  async (params={}, { rejectWithValue }) => {
     try {
-      const { data } = await axiosInstance.get("/user");
+      const { query = "", category = "" } = params;
+      const { data } = await axiosInstance.get("/user",{
+        params:{query,category},
+      });
       return data.data;
     } catch (error) {
       return rejectWithValue(
@@ -71,6 +74,24 @@ export const deleteUser = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "Delete failed"
+      );
+    }
+  }
+);
+
+export const assignExam = createAsyncThunk(
+  "user/assignExams",
+  async ({ userIds, examId }, { rejectWithValue }) => {
+    try {
+      const { data } = await axiosInstance.put(
+        "/user/assignExam",
+        { userIds, examId }
+      );
+
+      return { userIds, examId };
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to assign exam"
       );
     }
   }
@@ -147,7 +168,30 @@ const userSlice = createSlice({
       .addCase(loginUser.rejected, (state, action) => {
         state.loadingAuth = false;
         state.error = action.payload;
+      })
+      //AssignExam
+       .addCase(assignExam.pending, (state) => {
+        state.assigningExam = true;
+        state.error = null;
+      })
+
+      .addCase(assignExam.fulfilled, (state, action) => {
+        const { userIds, examId } = action.payload;
+
+        state.assigningExam = false;
+
+        state.users = state.users.map((user) =>
+          userIds.includes(user._id)
+            ? { ...user, examId }
+            : user
+        );
+      })
+
+      .addCase(assignExam.rejected, (state, action) => {
+        state.assigningExam = false;
+        state.error = action.payload;
       });
+  
   },
 });
 

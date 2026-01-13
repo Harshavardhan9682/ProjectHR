@@ -6,10 +6,10 @@ export const fetchQuestions = createAsyncThunk(
   "questions/fetch",
   async (params = {}, { rejectWithValue }) => {
     try {
-      const { query = "", type = "" } = params;
+      const { query = "", category= "" } = params;
 
       const response = await axiosInstance.get("/questions", {
-        params: { query, type },
+        params: { query,category },
       });
 
       return response.data.data;
