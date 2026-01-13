@@ -10,7 +10,7 @@ const {
 } = require("../controllers/addQuestions");
 
 questionsRoutes.post("/add",auth,addQuestions);
-questionsRoutes.get("/", auth,getQuestions);
+questionsRoutes.get("/",getQuestions);
 questionsRoutes.put("/:id",auth, updateQuestion);
 questionsRoutes.delete("/:id",auth, deleteQuestion);
 questionsRoutes.get("/:type",auth, getQuestionByType);

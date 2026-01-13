@@ -1,7 +1,13 @@
+
+
+
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../store/store";
-import { fetchExamQuestions } from "../slice/examQuestionsSlice";
+import {
+  fetchExamQuestions,
+  fetchExamById,
+} from "../slice/examQuestionsSlice";
 
 import {
   Card,
@@ -16,18 +22,51 @@ const ExamPaperList = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  const { data, loading } = useAppSelector(
+  const { state } = useLocation();
+  const currentUser = state?.currentUser;
+
+  const { data, loading, error } = useAppSelector(
     (state) => state.examQuestions
   );
 
+  /* ============================
+     FETCH DATA
+  ============================ */
   useEffect(() => {
-    dispatch(fetchExamQuestions());
-  }, [dispatch]);
+    if (currentUser?.examId) {
+      dispatch(fetchExamById(currentUser.examId));
+    } else {
+      dispatch(fetchExamQuestions());
+    }
+  }, [currentUser, dispatch]);
 
   if (loading) return <Typography>Loading exams...</Typography>;
+  if (error) return <Typography color="error">{error}</Typography>;
 
-  const exams = data?.data || [];
+  /* ============================
+     NORMALIZE DATA (KEY FIX)
+  ============================ */
+  let exams = [];
 
+  if (currentUser?.examId) {
+    // user → single object
+    exams = data ? [data] : [];
+  } else {
+    // admin → array
+    exams = data;
+  }
+
+  if (currentUser && exams.length === 0) {
+    return (
+      <Typography sx={{ p: 3 }}>
+        No exam assigned to you.
+      </Typography>
+    );
+  }
+
+  /* ============================
+     UI
+  ============================ */
   return (
     <Box sx={{ p: 3 }}>
       <Typography variant="h4" gutterBottom>
@@ -39,7 +78,7 @@ const ExamPaperList = () => {
           <Grid item xs={12} sm={6} md={4} key={exam._id}>
             <Card sx={{ height: "100%" }}>
               <CardContent>
-                <Typography variant="h6" gutterBottom>
+                <Typography variant="h6">
                   {exam.title}
                 </Typography>
 
@@ -69,26 +108,6 @@ const ExamPaperList = () => {
                 >
                   Start Exam
                 </Button>
-                {/* <Box sx={{marginTop:"10px", marginLeft:"15px"}}>
-                   <Typography sx={{display:"flex" ,gap:"10px", alignItems:"center"}}>
-                                        <img
-                                            src="/editIcon.png"
-                                            alt="edit"
-                                            width={30}
-                                            height={30}
-                                            
-                                            style={{ cursor: "pointer" }}
-                                          />
-                                          <img
-                                            src="/delete.png"
-                                            alt="delete"
-                                            width={35}
-                                            height={30}
-                                            
-                                            style={{ cursor: "pointer" }}
-                                          />
-                                    </Typography>
-                </Box> */}
               </CardContent>
             </Card>
           </Grid>

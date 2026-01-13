@@ -131,6 +131,7 @@ const userSlice = createSlice({
         state.loadingUsers = false;
         state.error = action.payload;
       })
+      
 
       /* REGISTER */
       .addCase(userRegister.fulfilled, (state, action) => {
@@ -152,7 +153,7 @@ const userSlice = createSlice({
         );
       })
 
-      /* LOGIN */
+      // LOGIN 
       .addCase(loginUser.pending, (state) => {
         state.loadingAuth = true;
         state.error = null;
@@ -162,6 +163,8 @@ const userSlice = createSlice({
         state.token = action.payload.token;
         state.currentUser = {
           category: action.payload.category,
+          role:action.payload.role,
+          examId:action.payload.examId
         };
         localStorage.setItem("token", action.payload.token);
       })

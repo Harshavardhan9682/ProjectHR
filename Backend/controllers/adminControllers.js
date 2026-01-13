@@ -71,8 +71,9 @@ exports.getTestData = async (req, res) => {
 };
 exports.getTestDataById = async (req, res) => {
   try {
+    console.log(req.params.id)
     const id = req.params.id;
-    const category=req.admin.role
+  
     const testdata = await testData.findById(id);
     
     res.status(200).json({ message: "data get successfully ", data: testdata });
@@ -130,7 +131,7 @@ exports.adminLogin=async(req,res)=>{
           process.env.ADMIN_KEY,
           { expiresIn: "30m" }
         );
-
+console.log(admin.role)
         res.status(200).json({
       token,
       role:admin.role

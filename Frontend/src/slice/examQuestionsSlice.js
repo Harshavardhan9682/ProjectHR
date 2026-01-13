@@ -18,6 +18,7 @@ export const fetchExamQuestions = createAsyncThunk(
 export const fetchExamById = createAsyncThunk(
   "exam/fetchById",
   async (examId, { rejectWithValue }) => {
+    console.log(examId)
     try {
       const res = await axiosInstance.get(`/admin/${examId}`);
       return res.data.data;
@@ -107,7 +108,7 @@ const examquestionsSlice = createSlice({
       })
       .addCase(fetchExamQuestions.fulfilled, (state, action) => {
         state.loading1 = false;
-        state.data = action.payload;
+        state.data = action.payload.data;
       })
       .addCase(fetchExamQuestions.rejected, (state, action) => {
         state.loading1 = false;

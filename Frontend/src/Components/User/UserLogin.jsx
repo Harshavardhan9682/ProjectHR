@@ -16,10 +16,10 @@ const Login = () => {
   const navigate = useNavigate();
   
 
-  const { loading, error, token } = useSelector(
+  const { loading, error, token,currentUser } = useSelector(
     (state) => state.user
   );
-
+console.log(currentUser)
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -41,10 +41,12 @@ const Login = () => {
 
   
   useEffect(() => {
-    if (token) {
-      navigate("/exam"); 
-    }
-  }, [token, navigate]);
+  if (token && currentUser) {
+    navigate("/examPapers", {
+      state: { currentUser },
+    });
+  }
+}, [token, currentUser, navigate]);
 
 
   return (

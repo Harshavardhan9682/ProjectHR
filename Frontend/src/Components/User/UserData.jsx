@@ -365,7 +365,7 @@ const Users = () => {
               <em>Select Exam</em>
             </MenuItem>
 
-            {data?.data?.map((exam) => (
+            {data.map((exam) => (
               <MenuItem key={exam._id} value={exam._id}>
                 {exam.title}
               </MenuItem>

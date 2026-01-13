@@ -33,10 +33,10 @@ const userRegisterSchema = new mongoose.Schema({
     default: 0,
   },
 
-  /* ✅ CORRECT EXAM FIELD */
+  
   examId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Exam", // optional but recommended
+    ref: "Exam", 
   },
 
   dateOfReg: {

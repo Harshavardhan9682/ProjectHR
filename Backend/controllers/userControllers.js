@@ -52,6 +52,8 @@ exports.loginUser = async (req, res) => {
     res.status(200).json({
       token,
       category: user.category,
+      examId: user.examId,
+      role:"user"
     });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -108,7 +110,7 @@ exports.assignExam = async (req, res) => {
   try {
     const { userIds, examId } = req.body;
 
-    // validation
+    
     if (!Array.isArray(userIds) || userIds.length === 0 || !examId) {
       return res.status(400).json({
         success: false,
@@ -116,9 +118,9 @@ exports.assignExam = async (req, res) => {
       });
     }
 
-    // BULK UPDATE
+    
     const result = await User.updateMany(
-      { _id: { $in: userIds } }, // Mongo auto-casts strings to ObjectId
+      { _id: { $in: userIds } },
       { $set: { examId } }
     );
 

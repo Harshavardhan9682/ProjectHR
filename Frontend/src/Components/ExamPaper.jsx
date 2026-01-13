@@ -31,7 +31,7 @@ const navigate=useNavigate()
   const { data, loading } = useAppSelector(
     (state) => state.examQuestions
   );
-  console.log(questions)
+  // console.log("questions",questions,data)
 
   const  examtimer=data.duration
   
@@ -55,6 +55,7 @@ const navigate=useNavigate()
       const filtered = questions.filter((q) =>
         ids.includes(q._id)
       );
+      console.log("filtered",filtered)
       setMcqs(filtered);
     }
   }, [ids, questions]);
@@ -94,7 +95,7 @@ const handleTimeUp = () => {
   localStorage.removeItem("token");
 };
 
-
+// console.log(mcqs)
 
   if (loading) return <Typography>Loading...</Typography>;
 
