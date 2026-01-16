@@ -29,9 +29,7 @@ const ExamPaperList = () => {
     (state) => state.examQuestions
   );
 
-  /* ============================
-     FETCH DATA
-  ============================ */
+  
   useEffect(() => {
     if (currentUser?.examId) {
       dispatch(fetchExamById(currentUser.examId));
@@ -43,16 +41,14 @@ const ExamPaperList = () => {
   if (loading) return <Typography>Loading exams...</Typography>;
   if (error) return <Typography color="error">{error}</Typography>;
 
-  /* ============================
-     NORMALIZE DATA (KEY FIX)
-  ============================ */
+
   let exams = [];
 
   if (currentUser?.examId) {
-    // user → single object
+ 
     exams = data ? [data] : [];
   } else {
-    // admin → array
+  
     exams = data;
   }
 
@@ -64,9 +60,7 @@ const ExamPaperList = () => {
     );
   }
 
-  /* ============================
-     UI
-  ============================ */
+
   return (
     <Box sx={{ p: 3 }}>
       <Typography variant="h4" gutterBottom>

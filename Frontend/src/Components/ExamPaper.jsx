@@ -87,9 +87,7 @@ const handleSubmitExam = () => {
 };
 
 const handleTimeUp = () => {
-  // if (!mcqs.length) return; // safety guard
-
-  alert("Time is up! Exam submitted.");
+  
   handleSubmitExam();
   navigate("/login")
   localStorage.removeItem("token");

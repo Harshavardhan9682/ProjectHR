@@ -1,10 +1,14 @@
 
 
 
-
 // import React, { useEffect, useState } from "react";
 // import { useAppDispatch, useAppSelector } from "../../store/store";
-// import { fetchUsers, updateUser, assignExam,deleteUser } from "../../slice/userSlice";
+// import {
+//   fetchUsers,
+//   deleteUser,
+//   assignExam,
+//   updateUser,
+// } from "../../slice/userSlice";
 // import { fetchExamQuestions } from "../../slice/examQuestionsSlice";
 
 // import {
@@ -19,7 +23,7 @@
 //   TableRow,
 //   Paper,
 //   Button,
-//   Radio,
+//   Checkbox,
 //   Select,
 //   MenuItem,
 // } from "@mui/material";
@@ -29,28 +33,28 @@
 // const Users = () => {
 //   const dispatch = useAppDispatch();
 
-//   // redux state
-//    const { users, loading, error } = useAppSelector((state) => state.user);
-//   const { data} = useAppSelector((state) => state.examQuestions);
-//   // local state
+//   /* REDUX STATE */
+//   const { users, loading, error } = useAppSelector((state) => state.user);
+//   const { data } = useAppSelector((state) => state.examQuestions);
+
+//   /* LOCAL STATE */
 //   const [query, setQuery] = useState("");
 //   const [category, setType] = useState("");
 //   const [isEditMode, setIsEditMode] = useState(false);
-//   const [selectedUserId, setSelectedUserId] = useState("");
+//   const [selectedUserIds, setSelectedUserIds] = useState([]);
 //   const [selectedExamId, setSelectedExamId] = useState("");
 
-//   console.log(data.data)
-//   // fetch users
+//   /* FETCH USERS */
 //   useEffect(() => {
 //     dispatch(fetchUsers({ query, category }));
 //   }, [query, category, dispatch]);
 
-//   // fetch exams
+//   /* FETCH EXAMS */
 //   useEffect(() => {
 //     dispatch(fetchExamQuestions());
 //   }, [dispatch]);
 
-//   // status toggle
+//   /* TOGGLE USER STATUS */
 //   const handleStatusSwitch = (user) => {
 //     dispatch(
 //       updateUser({
@@ -62,29 +66,26 @@
 //     );
 //   };
 
-//   // delete user
+//   /* DELETE USER */
 //   const handleDelete = (id) => {
 //     if (window.confirm("Are you sure you want to delete this user?")) {
 //       dispatch(deleteUser(id));
 //     }
 //   };
 
-//   // assign exam
+//   /* BULK ASSIGN EXAM */
 //   const handleAssignExam = () => {
-//     if (!selectedUserId || !selectedExamId) return;
+//     if (!selectedUserIds.length || !selectedExamId) return;
 
 //     dispatch(
-//       updateUser({
-//         id: selectedUserId,
-//         updateData: {
-//           examId: selectedExamId,
-//         },
+//       assignExam({
+//         userIds: selectedUserIds,
+//         examId: selectedExamId,
 //       })
 //     );
 
-//     // reset edit mode
 //     setIsEditMode(false);
-//     setSelectedUserId("");
+//     setSelectedUserIds([]);
 //     setSelectedExamId("");
 //   };
 
@@ -107,7 +108,7 @@
 //         <Button
 //           onClick={() => {
 //             setIsEditMode((prev) => !prev);
-//             setSelectedUserId("");
+//             setSelectedUserIds([]);
 //             setSelectedExamId("");
 //           }}
 //         >
@@ -131,14 +132,14 @@
 //             value={selectedExamId}
 //             onChange={(e) => setSelectedExamId(e.target.value)}
 //             displayEmpty
-//             disabled={!selectedUserId}
+//             disabled={!selectedUserIds.length}
 //             sx={{ minWidth: 220 }}
 //           >
 //             <MenuItem value="">
 //               <em>Select Exam</em>
 //             </MenuItem>
 
-//             {data?.data?.map((exam) => (
+//             {data.map((exam) => (
 //               <MenuItem key={exam._id} value={exam._id}>
 //                 {exam.title}
 //               </MenuItem>
@@ -147,7 +148,7 @@
 
 //           <Button
 //             variant="contained"
-//             disabled={!selectedUserId || !selectedExamId}
+//             disabled={!selectedUserIds.length || !selectedExamId}
 //             onClick={handleAssignExam}
 //           >
 //             Update Exam
@@ -176,9 +177,22 @@
 //               <TableRow key={user._id}>
 //                 {isEditMode && (
 //                   <TableCell>
-//                     <Radio
-//                       checked={selectedUserId === user._id}
-//                       onChange={() => setSelectedUserId(user._id)}
+//                     <Checkbox
+//                       checked={selectedUserIds.includes(user._id)}
+//                       onChange={(e) => {
+//                         if (e.target.checked) {
+//                           setSelectedUserIds([
+//                             ...selectedUserIds,
+//                             user._id,
+//                           ]);
+//                         } else {
+//                           setSelectedUserIds(
+//                             selectedUserIds.filter(
+//                               (id) => id !== user._id
+//                             )
+//                           );
+//                         }
+//                       }}
 //                     />
 //                   </TableCell>
 //                 )}
@@ -224,9 +238,6 @@
 
 // export default Users;
 
-
-
-
 import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import {
@@ -239,7 +250,6 @@ import { fetchExamQuestions } from "../../slice/examQuestionsSlice";
 
 import {
   Box,
-  CircularProgress,
   Typography,
   Table,
   TableBody,
@@ -255,32 +265,32 @@ import {
 } from "@mui/material";
 import Switch from "@mui/material/Switch";
 import SearchQuestion from "../Search";
+import TableSkeleton from "./TableComponent";
 
 const Users = () => {
   const dispatch = useAppDispatch();
 
-  /* REDUX STATE */
   const { users, loading, error } = useAppSelector((state) => state.user);
   const { data } = useAppSelector((state) => state.examQuestions);
-
-  /* LOCAL STATE */
+const [loading1, setloading] =useState(true)
   const [query, setQuery] = useState("");
   const [category, setType] = useState("");
   const [isEditMode, setIsEditMode] = useState(false);
   const [selectedUserIds, setSelectedUserIds] = useState([]);
   const [selectedExamId, setSelectedExamId] = useState("");
 
-  /* FETCH USERS */
   useEffect(() => {
     dispatch(fetchUsers({ query, category }));
+    setTimeout(()=>{
+      setloading(false)
+    },1000)
   }, [query, category, dispatch]);
 
-  /* FETCH EXAMS */
   useEffect(() => {
     dispatch(fetchExamQuestions());
+    
   }, [dispatch]);
 
-  /* TOGGLE USER STATUS */
   const handleStatusSwitch = (user) => {
     dispatch(
       updateUser({
@@ -291,38 +301,35 @@ const Users = () => {
       })
     );
   };
+if(users.length <= 0){
+  setTimeout(()=>{
+      setloading(false)
+    },1000)
+}
+  
+    
 
-  /* DELETE USER */
   const handleDelete = (id) => {
     if (window.confirm("Are you sure you want to delete this user?")) {
       dispatch(deleteUser(id));
     }
   };
 
-  /* BULK ASSIGN EXAM */
   const handleAssignExam = () => {
     if (!selectedUserIds.length || !selectedExamId) return;
 
-    dispatch(
-      assignExam({
-        userIds: selectedUserIds,
-        examId: selectedExamId,
-      })
-    );
+    dispatch(assignExam({ userIds: selectedUserIds, examId: selectedExamId }));
 
     setIsEditMode(false);
     setSelectedUserIds([]);
     setSelectedExamId("");
   };
 
-  if (loading) return <CircularProgress />;
   if (error) return <Typography color="error">{error}</Typography>;
-  if (!users || users.length === 0)
-    return <Typography>No users found</Typography>;
 
   return (
     <Box sx={{ p: 3 }}>
-      {/* HEADER */}
+      
       <Box
         sx={{
           display: "flex",
@@ -338,7 +345,7 @@ const Users = () => {
             setSelectedExamId("");
           }}
         >
-          <img src="/editIcon.png" width="30px" />
+          <img src="/editIcon.png" width="30px" alt="edit" />
         </Button>
 
         <Typography variant="h5">Users</Typography>
@@ -351,7 +358,7 @@ const Users = () => {
         />
       </Box>
 
-      {/* EXAM DROPDOWN + UPDATE BUTTON */}
+      {/* EXAM ASSIGN */}
       {isEditMode && (
         <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
           <Select
@@ -399,62 +406,68 @@ const Users = () => {
           </TableHead>
 
           <TableBody>
-            {users.map((user, index) => (
-              <TableRow key={user._id}>
-                {isEditMode && (
-                  <TableCell>
-                    <Checkbox
-                      checked={selectedUserIds.includes(user._id)}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setSelectedUserIds([
-                            ...selectedUserIds,
-                            user._id,
-                          ]);
-                        } else {
-                          setSelectedUserIds(
-                            selectedUserIds.filter(
-                              (id) => id !== user._id
-                            )
-                          );
-                        }
-                      }}
-                    />
-                  </TableCell>
-                )}
-
-                <TableCell>{index + 1}</TableCell>
-                <TableCell>{user.name}</TableCell>
-                <TableCell>{user.email}</TableCell>
-                <TableCell>{user.category}</TableCell>
-                <TableCell>{user.count}</TableCell>
-
-                <TableCell
-                  sx={{
-                    fontWeight: "bold",
-                    color: user.status === "Active" ? "green" : "red",
-                  }}
-                >
-                  {user.status}
-                </TableCell>
-
-                <TableCell>
-                  <Switch
-                    checked={user.status === "Active"}
-                    onChange={() => handleStatusSwitch(user)}
-                  />
-
-                  <img
-                    src="/delete.png"
-                    alt="delete"
-                    width={20}
-                    height={20}
-                    style={{ cursor: "pointer", marginLeft: 10 }}
-                    onClick={() => handleDelete(user._id)}
-                  />
+            {loading1 ? (
+              <TableSkeleton
+                rows={6}
+                columns={7}
+                isEditMode={isEditMode}
+              />
+            ) : users.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={8}>
+                  <Typography align="center">No users found</Typography>
                 </TableCell>
               </TableRow>
-            ))}
+            ) : (
+              users.map((user, index) => (
+                <TableRow key={user._id}>
+                  {isEditMode && (
+                    <TableCell>
+                      <Checkbox
+                        checked={selectedUserIds.includes(user._id)}
+                        onChange={(e) =>
+                          e.target.checked
+                            ? setSelectedUserIds([...selectedUserIds, user._id])
+                            : setSelectedUserIds(
+                                selectedUserIds.filter((id) => id !== user._id)
+                              )
+                        }
+                      />
+                    </TableCell>
+                  )}
+
+                  <TableCell>{index + 1}</TableCell>
+                  <TableCell>{user.name}</TableCell>
+                  <TableCell>{user.email}</TableCell>
+                  <TableCell>{user.category}</TableCell>
+                  <TableCell>{user.count}</TableCell>
+
+                  <TableCell
+                    sx={{
+                      fontWeight: "bold",
+                      color: user.status === "Active" ? "green" : "red",
+                    }}
+                  >
+                    {user.status}
+                  </TableCell>
+
+                  <TableCell>
+                    <Switch
+                      checked={user.status === "Active"}
+                      onChange={() => handleStatusSwitch(user)}
+                    />
+                    <img
+                      src="/delete.png"
+                      alt="delete"
+                      width={20}
+                      height={20}
+                      style={{ cursor: "pointer", marginLeft: 10 }}
+                      onClick={() => handleDelete(user._id)}
+                    />
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </TableContainer>
@@ -463,3 +476,5 @@ const Users = () => {
 };
 
 export default Users;
+ 
+
